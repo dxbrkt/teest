@@ -1,0 +1,10 @@
+# Backend / image processing — no UI dependencies
+Pillow>=8.0.0
+numpy>=1.21.0
+vpk>=1.3.4
+vtf2img>=0.1.0
+
+# Dev / CI
+pyinstaller>=5.13.0
+coverage>=7.6.0
+vulture>=2.11

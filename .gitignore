@@ -1,0 +1,77 @@
+# ══════════════════════════════════════════════════════════════
+#  Tf2SkinGenerator — .gitignore
+#  В репозитории: исходный код, src/, tools/mod_data, конфиги-шаблоны
+#  НЕ в репозитории: сборка, бинари, IDE, временные файлы
+# ══════════════════════════════════════════════════════════════
+
+# ── Python runtime ────────────────────────────────────────────
+.venv/
+__pycache__/
+*.py[cod]
+*.pyo
+
+# ── Тесты / покрытие ──────────────────────────────────────────
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coveragerc
+coverage.json
+htmlcov/
+mainTest.py
+run_test.bat
+
+# ── Сборка (PyInstaller / distutils) ─────────────────────────
+dist/
+*.spec
+
+# ── C++ билд папки ────────────────────────────────────────────
+frontend/build/
+frontend/build_win/
+
+# ── Скрипты сборки и установщик ──────────────────────────────
+*.ps1
+installer/
+
+# ── Временные выходные папки ──────────────────────────────────
+out/
+export/
+exportTest/
+
+# ── Конфигурация с машинными путями ──────────────────────────
+# Коммитить только примеры: config/*.example.json
+config/*.json
+!config/*.example.json
+
+# ── Инструменты: временные и генерируемые папки ───────────────
+tools/temp/
+tools/temp_vmt_extract/
+tools/edited_vmt/
+tools/backupVMT/
+
+# ── Инструменты: сторонние бинари (скачиваются отдельно) ──────
+tools/crowbar/
+tools/VPK/
+tools/VTF/
+
+# ── Логи и мусорные файлы ────────────────────────────────────
+*.log
+*.tmp
+# Только мусорные txt (тестовые артефакты)
+out.txt
+err.txt
+test_*.txt
+*_err.txt
+
+# ── IDE ───────────────────────────────────────────────────────
+.vscode/
+.idea/
+.claude/
+
+# ── OS ────────────────────────────────────────────────────────
+Thumbs.db
+Desktop.ini
+*.lnk
+.DS_Store
+cache/hats_cache.json
+backend.port
