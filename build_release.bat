@@ -16,26 +16,18 @@ echo.
 
 :: ── Find Qt ───────────────────────────────────────────────────────────────── ::
 set QT_DIR=
-for %%P in (
-    "C:\Qt\6.11.0\msvc2022_64"
-    "C:\Qt\6.10.0\msvc2022_64"
-    "C:\Qt\6.9.0\msvc2022_64"
-    "C:\Qt\6.8.0\msvc2022_64"
-    "C:\Qt\6.7.0\msvc2022_64"
-    "C:\Qt\6.7.0\msvc2019_64"
-    "C:\Qt\6.6.0\msvc2019_64"
-    "C:\Qt\6.5.0\msvc2019_64"
-    "C:\Qt\6.7.0\mingw_64"
-    "C:\Qt\6.6.0\mingw_64"
-) do (
-    if exist "%%~P\lib\cmake\Qt6" (
-        set QT_DIR=%%~P
-        goto :qt_found
-    )
-)
-:qt_found
+if exist "C:\Qt\6.11.0\msvc2022_64\lib\cmake\Qt6" set QT_DIR=C:\Qt\6.11.0\msvc2022_64
+if exist "C:\Qt\6.10.0\msvc2022_64\lib\cmake\Qt6" set QT_DIR=C:\Qt\6.10.0\msvc2022_64
+if exist "C:\Qt\6.9.0\msvc2022_64\lib\cmake\Qt6"  set QT_DIR=C:\Qt\6.9.0\msvc2022_64
+if exist "C:\Qt\6.8.0\msvc2022_64\lib\cmake\Qt6"  set QT_DIR=C:\Qt\6.8.0\msvc2022_64
+if exist "C:\Qt\6.7.0\msvc2022_64\lib\cmake\Qt6"  set QT_DIR=C:\Qt\6.7.0\msvc2022_64
+if exist "C:\Qt\6.7.0\msvc2019_64\lib\cmake\Qt6"  set QT_DIR=C:\Qt\6.7.0\msvc2019_64
+if exist "C:\Qt\6.6.0\msvc2019_64\lib\cmake\Qt6"  set QT_DIR=C:\Qt\6.6.0\msvc2019_64
+if exist "C:\Qt\6.7.0\mingw_64\lib\cmake\Qt6"     set QT_DIR=C:\Qt\6.7.0\mingw_64
+if exist "C:\Qt\6.6.0\mingw_64\lib\cmake\Qt6"     set QT_DIR=C:\Qt\6.6.0\mingw_64
+
 if "%QT_DIR%"=="" (
-    echo [ERROR] Qt 6 not found. Install from https://www.qt.io/download
+    echo [ERROR] Qt 6 not found. Install from qt.io/download
     pause & exit /b 1
 )
 echo [OK] Qt: %QT_DIR%
