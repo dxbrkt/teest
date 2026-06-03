@@ -28,6 +28,11 @@ dist/
 # ── C++ билд папки ────────────────────────────────────────────
 frontend/build/
 frontend/build_win/
+frontend/build_release/
+
+# ── PyInstaller артефакты ─────────────────────────────────────
+build_pyinstaller/
+dist_pyinstaller/
 
 # ── Скрипты сборки и установщик ──────────────────────────────
 *.ps1

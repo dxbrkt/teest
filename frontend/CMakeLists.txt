@@ -42,6 +42,8 @@ endif()
 qt_add_qml_module(Tf2SkinGeneratorUI
     URI TF2SG
     VERSION 1.0
+    RESOURCES
+        src/CritIcon.png
     QML_FILES
         qml/main.qml
         qml/AppWindow.qml

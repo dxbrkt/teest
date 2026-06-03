@@ -201,16 +201,34 @@ Item {
 
                     RowLayout {
                         anchors { fill: parent; leftMargin: 12; rightMargin: 12 }
+                        spacing: 7
+
+                        // иконка — жёстко фиксируем размер через Item-обёртку
+                        Item {
+                            Layout.preferredWidth: 18
+                            Layout.preferredHeight: 18
+                            Layout.alignment: Qt.AlignVCenter
+                            Image {
+                                anchors.fill: parent
+                                source: "qrc:/TF2SG/src/CritIcon.png"
+                                fillMode: Image.PreserveAspectFit
+                                smooth: true
+                            }
+                        }
+
                         Text {
-                            text: "💥  CritHIT"
+                            text: "CritHIT"
                             color: critHitOn ? "#FF6B35" : Qt.rgba(1,1,1,0.60)
                             font.pixelSize: 13
                             font.weight: critHitOn ? 600 : 400
                             Layout.fillWidth: true
                         }
-                        // индикатор вкл/выкл
+
+                        // тогл-переключатель
                         Rectangle {
-                            width: 28; height: 16; radius: 8
+                            Layout.preferredWidth: 28
+                            Layout.preferredHeight: 16
+                            radius: 8
                             color: critHitOn ? Qt.rgba(1,0.42,0.21,0.80) : Qt.rgba(1,1,1,0.12)
                             Behavior on color { ColorAnimation { duration: 150 } }
                             Rectangle {

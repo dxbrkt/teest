@@ -14,7 +14,16 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 from pathlib import Path
 from typing import Dict, Optional
 
-ROOT = Path(__file__).parent
+# в замороженном PyInstaller-бандле __file__ ведёт в _MEIPASS
+# в обычном режиме — просто рядом со скриптом
+if getattr(sys, "frozen", False):
+    ROOT = Path(sys._MEIPASS)          # распакованные данные в temp
+    # порт-файл пишем в temp — в bundle директория может быть read-only
+    _PORT_FILE = Path(os.environ.get("TMPDIR", "/tmp")) / "tf2sg_backend.port"
+else:
+    ROOT = Path(__file__).parent
+    _PORT_FILE = ROOT / "backend.port"
+
 sys.path.insert(0, str(ROOT))
 
 from src.data.weapons import TF2_WEAPONS, TF2_CLASSES, get_weapon_type_name
@@ -298,7 +307,7 @@ def main():
     if not port:
         port = _free_port()
 
-    (ROOT / "backend.port").write_text(str(port))
+    _PORT_FILE.write_text(str(port))
 
     server = HTTPServer(("127.0.0.1", port), APIHandler)
     logger.info(f"Backend HTTP server on 127.0.0.1:{port}")
@@ -308,7 +317,7 @@ def main():
         server.serve_forever()
     finally:
         try:
-            (ROOT / "backend.port").unlink()
+            _PORT_FILE.unlink()
         except FileNotFoundError:
             pass
 
