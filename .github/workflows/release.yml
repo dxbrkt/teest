@@ -1,0 +1,77 @@
+name: Build & Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: "6.7.0"
+          host: windows
+          target: desktop
+          arch: win64_msvc2019_64
+          modules: qtwebengine qtwebchannel qtpositioning
+
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt pyinstaller
+
+      - name: Configure C++ frontend
+        run: >
+          cmake -S frontend -B frontend/build_release
+          -DCMAKE_BUILD_TYPE=Release
+          -DCMAKE_PREFIX_PATH="${{ env.Qt6_DIR }}"
+          -Wno-dev
+
+      - name: Build C++ frontend
+        run: cmake --build frontend/build_release --config Release --parallel
+
+      - name: Bundle Python backend (PyInstaller)
+        run: >
+          pyinstaller --noconfirm backend.spec
+          --distpath dist_pyinstaller
+          --workpath build_pyinstaller
+
+      - name: Assemble release folder
+        shell: cmd
+        run: |
+          mkdir dist\TF2SkinGenerator
+          copy frontend\build_release\Release\Tf2SkinGeneratorUI.exe dist\TF2SkinGenerator\TF2SkinGenerator.exe
+          xcopy /E /I /Q dist_pyinstaller\backend_server dist\TF2SkinGenerator
+          if exist tools xcopy /E /I /Q tools dist\TF2SkinGenerator\tools
+
+      - name: Run windeployqt
+        shell: cmd
+        run: |
+          windeployqt dist\TF2SkinGenerator\TF2SkinGenerator.exe ^
+            --qmldir frontend\qml ^
+            --release ^
+            --no-translations
+
+      - name: Zip release
+        shell: pwsh
+        run: |
+          Compress-Archive -Path dist\TF2SkinGenerator\* `
+            -DestinationPath dist\TF2SkinGenerator-${{ github.ref_name }}-windows.zip
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/TF2SkinGenerator-${{ github.ref_name }}-windows.zip
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
