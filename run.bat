@@ -1,5 +1,6 @@
 @echo off
-:: run.bat — собирает C++ фронтенд (если нужно) и запускает TF2 Skin Generator
+chcp 65001 >nul
+:: run.bat - builds C++ frontend (if needed) and launches TF2 Skin Generator
 setlocal enabledelayedexpansion
 
 set SCRIPT_DIR=%~dp0
@@ -7,7 +8,20 @@ set FRONTEND_DIR=%SCRIPT_DIR%frontend
 set BUILD_DIR=%FRONTEND_DIR%\build_win
 set EXE=%BUILD_DIR%\Release\Tf2SkinGeneratorUI.exe
 
-:: ── Ищем Qt ───────────────────────────────────────────────────────────────── ::
+echo ============================================
+echo  TF2 Skin Generator - Developer Launch
+echo ============================================
+echo.
+echo  NOTE: This script is for DEVELOPERS only.
+echo  It requires Qt 6, CMake, Python and Visual
+echo  Studio Build Tools to be installed.
+echo.
+echo  For end users: use the pre-built release
+echo  from the Releases page on GitHub.
+echo ============================================
+echo.
+
+:: ── Find Qt ───────────────────────────────────────────────────────────────── ::
 set QT_DIR=
 for %%P in (
     "C:\Qt\6.11.0\msvc2022_64"
@@ -29,60 +43,61 @@ for %%P in (
 
 :qt_found
 if "%QT_DIR%"=="" (
+    echo [ERROR] Qt 6 not found.
     echo.
-    echo [ERROR] Qt 6 не найден.
-    echo         Установи Qt с https://www.qt.io/download
-    echo         Выбери компонент: Qt 6.x.x ^> MSVC 2019/2022 64-bit
+    echo  Please install Qt 6 from: https://www.qt.io/download
+    echo  During install select: Qt 6.x.x ^> MSVC 2022 64-bit
     echo.
     pause
     exit /b 1
 )
 echo [OK] Qt: %QT_DIR%
 
-:: ── Проверяем cmake ───────────────────────────────────────────────────────── ::
+:: ── Check cmake ───────────────────────────────────────────────────────────── ::
 where cmake >nul 2>&1
 if errorlevel 1 (
+    echo [ERROR] cmake not found.
     echo.
-    echo [ERROR] cmake не найден. Установи CMake: https://cmake.org/download
-    echo         Или установи Qt — он включает CMake в installer.
+    echo  Install CMake from: https://cmake.org/download
+    echo  Or install via Qt installer (it includes CMake).
     echo.
     pause
     exit /b 1
 )
 
-:: ── Проверяем Python ─────────────────────────────────────────────────────── ::
+:: ── Check Python ──────────────────────────────────────────────────────────── ::
 set PYTHON_CMD=
 where python >nul 2>&1 && set PYTHON_CMD=python
 if "%PYTHON_CMD%"=="" (
     where python3 >nul 2>&1 && set PYTHON_CMD=python3
 )
 if "%PYTHON_CMD%"=="" (
+    echo [ERROR] Python not found.
     echo.
-    echo [ERROR] Python не найден.
-    echo         Установи Python 3.10+ с https://python.org
-    echo         При установке отметь "Add Python to PATH"
+    echo  Install Python 3.10+ from: https://python.org
+    echo  During install check "Add Python to PATH"
     echo.
     pause
     exit /b 1
 )
 echo [OK] Python: %PYTHON_CMD%
 
-:: ── Устанавливаем Python-зависимости ─────────────────────────────────────── ::
-echo [..] Проверяем Python-зависимости...
+:: ── Install Python dependencies ───────────────────────────────────────────── ::
+echo [..] Installing Python dependencies...
 %PYTHON_CMD% -m pip install -r "%SCRIPT_DIR%requirements.txt" -q --disable-pip-version-check
 if errorlevel 1 (
-    echo [WARN] pip install завершился с ошибкой — продолжаем...
+    echo [WARN] pip install finished with errors - continuing...
 )
-echo [OK] Python-зависимости установлены
+echo [OK] Python dependencies ready
 
-:: ── Собираем C++ фронтенд (только если exe не существует) ────────────────── ::
+:: ── Build C++ frontend (only if exe does not exist) ───────────────────────── ::
 if exist "%EXE%" (
-    echo [OK] Фронтенд уже собран, пропускаем сборку
+    echo [OK] Frontend already built, skipping build
     goto :launch
 )
 
 echo.
-echo [..] Сборка C++ фронтенда (первый запуск — займёт 1-3 минуты)...
+echo [..] Building C++ frontend (first run - may take 1-3 minutes)...
 echo.
 
 cmake -S "%FRONTEND_DIR%" -B "%BUILD_DIR%" ^
@@ -91,9 +106,10 @@ cmake -S "%FRONTEND_DIR%" -B "%BUILD_DIR%" ^
     -Wno-dev
 if errorlevel 1 (
     echo.
-    echo [ERROR] CMake configure завершился с ошибкой.
-    echo         Убедись что установлены Visual Studio Build Tools:
-    echo         https://visualstudio.microsoft.com/visual-cpp-build-tools/
+    echo [ERROR] CMake configure failed.
+    echo.
+    echo  Make sure Visual Studio Build Tools are installed:
+    echo  https://visualstudio.microsoft.com/visual-cpp-build-tools/
     echo.
     pause
     exit /b 1
@@ -102,16 +118,16 @@ if errorlevel 1 (
 cmake --build "%BUILD_DIR%" --config Release --parallel
 if errorlevel 1 (
     echo.
-    echo [ERROR] Сборка завершилась с ошибкой.
+    echo [ERROR] Build failed.
     pause
     exit /b 1
 )
 echo.
-echo [OK] Сборка завершена
+echo [OK] Build complete
 
-:: ── Запуск ───────────────────────────────────────────────────────────────── ::
+:: ── Launch ───────────────────────────────────────────────────────────────── ::
 :launch
 echo.
-echo [..] Запуск TF2 Skin Generator...
+echo [..] Launching TF2 Skin Generator...
 cd /d "%SCRIPT_DIR%"
 start "" "%EXE%"
